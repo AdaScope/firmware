@@ -6,11 +6,11 @@ The main README for the project can be found in the **[UI repository](https://gi
 
 The UI repository contains
 
-- Team Members and their Roles
-- Related Repo
-- Documentation
-- Objectives
-- Expected/Anticipated Architecture
-- Anticipated Risks
-- Legal and Social Issues
-- Initial Plans for Release
+- [Team Members and their Roles](https://github.com/AdaScope/ui#team-members-and-their-roles)
+- [Related Repo](https://github.com/AdaScope/ui#related-repo)
+- [Documentation](https://github.com/AdaScope/ui#documentation)
+- [Objectives](https://github.com/AdaScope/ui#objectives)
+- [Expected/Anticipated Architecture](https://github.com/AdaScope/ui#expectedanticipated-architecture)
+- [Anticipated Risks](https://github.com/AdaScope/ui#anticipated-risks)
+- [Legal and Social Issues](https://github.com/AdaScope/ui#legal-and-social-issues)
+- [Initial Plans for Release](https://github.com/AdaScope/ui#initial-plans-for-release)
