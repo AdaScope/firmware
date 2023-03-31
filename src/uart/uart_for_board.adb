@@ -112,17 +112,18 @@ procedure Uart_For_Board is
 
    procedure Put_Blocking (This : in out USART;  Data : UInt16) is
    begin
-      --Await_Send_Ready (This);
+      Await_Send_Ready (This);
       Transmit (This, UInt9 (Data));
    end Put_Blocking;
 
 begin
    Initialize;
    loop
-      for Next_Char in Character range 'a' .. 'z' loop  -- arbitrary
+      for Next_Char in Character range '0' .. '9' loop  -- arbitrary
          Put_Blocking (USART_1, Character'Pos (Next_Char));
-         Next_Release := Next_Release + Period;
-         delay until Next_Release;
+         Put_Blocking (USART_1, Character'Pos (ASCII.LF));
+         --Next_Release := Next_Release + Period;
+         --delay until Next_Release;
       end loop;
    end loop;
 end Uart_For_Board;
