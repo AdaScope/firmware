@@ -143,7 +143,7 @@ procedure Adc_Standalone is
         Result : Simple_Adc.Status_T := Read_ADC_Value (1, Value'Unchecked_Access);
     begin
         
-        Log_To_LCD ("Voltage:" & Value'Image & " mV");
+        --Log_To_LCD ("Voltage:" & Value'Image & " mV");
         temp := To_Unbounded_String (Value'Image);
         for i in 2 .. Length(temp) loop
           Put_Blocking(USART_1, Character'Pos(Element(temp, i)));
