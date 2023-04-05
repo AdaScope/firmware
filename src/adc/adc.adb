@@ -8,8 +8,8 @@ package body Adc is
    procedure Init_ADC is
 
       Converter     : Analog_To_Digital_Converter renames ADC_1;
-      Input_Channel : constant Analog_Input_Channel := 7;
-      Input         : constant GPIO_Point           := PA7;
+      Input_Channel : constant Analog_Input_Channel := 13;
+      Input         : constant GPIO_Point           := PC3;
 
       Controller : DMA_Controller renames DMA_2;
       Stream     : constant DMA_Stream_Selector := Stream_0;
