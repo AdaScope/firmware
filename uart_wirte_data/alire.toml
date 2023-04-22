@@ -1,0 +1,9 @@
+name = "uart_wirte_data"
+description = "Shiny new project"
+version = "0.1.0-dev"
+
+authors = ["Basma Kaanane"]
+maintainers = ["Basma Kaanane <bkaan006@uottawa.ca>"]
+maintainers-logins = ["github-basmakaa"]
+
+executables = ["uart_wirte_data"]
