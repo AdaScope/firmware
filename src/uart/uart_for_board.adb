@@ -41,21 +41,13 @@ with Ada.Real_Time; use Ada.Real_Time;
 
 with Beta_Types; use Beta_Types;
 
-procedure Uart_For_Board is
+package body Uart_For_Board is
 
    Period : constant Time_Span := Milliseconds (250);  -- arbitrary
    Next_Release : Time := Clock;
 
    TX_Pin : constant GPIO_Point := PA9;
    RX_Pin : constant GPIO_Point := PA10;
-
-   procedure Initialize_UART_GPIO;
-
-   procedure Initialize;
-
-   procedure Await_Send_Ready (This : USART) with Inline;
-
-   procedure Put_Blocking (This : in out USART;  Data : UInt16);
 
    --------------------------
    -- Initialize_UART_GPIO --
@@ -116,14 +108,4 @@ procedure Uart_For_Board is
       Transmit (This, UInt9 (Data));
    end Put_Blocking;
 
-begin
-   Initialize;
-   loop
-      for Next_Char in Character range '0' .. '9' loop  -- arbitrary
-         Put_Blocking (USART_1, Character'Pos (Next_Char));
-         Put_Blocking (USART_1, Character'Pos (ASCII.LF));
-         --Next_Release := Next_Release + Period;
-         --delay until Next_Release;
-      end loop;
-   end loop;
 end Uart_For_Board;
