@@ -1,31 +1,18 @@
 
-on:                    # Run the workflow for each of the following event:
-  push:                # - A branch is pushed or updated.
-  pull_request:        # - A pull-request is openned or updated.
-  workflow_dispatch:   # - A manual run of the workflow is requested
-  release:
-    types: [created]   # - A release is created.
+name: Super-Linter
+
+on: push
 
 jobs:
-  test:
-    strategy:
-
-      fail-fast: false # Don't stop all the workflows when one of them fails.
-
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest] # List of GitHuh Actions platform to run the workflow on
-
-    runs-on: ${{ matrix.os }} # Run the continous integration workflow on each OS listed in the matrix.
-
+  super-lint:
+    name: Lint code base
+    runs-on: ubuntu-latest
     steps:
-        # Check-out the repository
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-        # Install and setup Alire package manager
-      - uses: alire-project/setup-alire@v2
-
-        # Build the project using the validation build profile to enforce static analysis and coding style.
-      - run: alr build --validation
-
-        # Build & run tests
-      - run: cd test && alr build --validation && alr run
+      - name: Run Super-Linter
+        uses: github/super-linter@v4
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
