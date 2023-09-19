@@ -1,24 +1,31 @@
-name: Ada (GNAT)
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on:                    # Run the workflow for each of the following event:
+  push:                # - A branch is pushed or updated.
+  pull_request:        # - A pull-request is openned or updated.
+  workflow_dispatch:   # - A manual run of the workflow is requested
+  release:
+    types: [created]   # - A release is created.
 
 jobs:
-  build:
+  test:
+    strategy:
 
-    runs-on: ubuntu-latest
+      fail-fast: false # Don't stop all the workflows when one of them fails.
+
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest] # List of GitHuh Actions platform to run the workflow on
+
+    runs-on: ${{ matrix.os }} # Run the continous integration workflow on each OS listed in the matrix.
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+        # Check-out the repository
+      - uses: actions/checkout@v2
 
-    - name: Set up GNAT toolchain
-      run: >
-        sudo apt-get update &&
-        sudo apt-get install gnat gprbuild
+        # Install and setup Alire package manager
+      - uses: alire-project/setup-alire@v2
 
-    - name: Build
-      run: gprbuild -j0 -p
+        # Build the project using the validation build profile to enforce static analysis and coding style.
+      - run: alr build --validation
+
+        # Build & run tests
+      - run: cd test && alr build --validation && alr run
