@@ -25,4 +25,4 @@ jobs:
       
 
         # Build the project using the validation build profile to enforce static analysis and coding style.
-      - run: alr build 
+      - run: alr -n build 
