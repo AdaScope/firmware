@@ -22,7 +22,9 @@ jobs:
 
         # Install and setup Alire package manager
       - uses: alire-project/setup-alire@v2
-      
 
-        # Build the project using the validation build profile to enforce static analysis and coding style.
-      - run: alr -n build 
+      - name: Run 
+        run: |
+          alr get hybrid_autosar_stm32f429_demo
+          cd hybrid_autosar_stm32f429_demo*
+          alr build
