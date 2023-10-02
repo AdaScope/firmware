@@ -24,9 +24,8 @@ jobs:
       - uses: alire-project/setup-alire@v2
 
       - name: Run 
-        run: | 
-          alr index --add git+https://github.com/ohenley/alire-index.git#stable-1.2.1 --name testindex
-          alr index --del testindex
-          alr get hybrid_autosar_stm32f429_demo
-          cd hybrid_autosar_stm32f429_demo*
-          alr build
+        run: |
+         alr init 
+         alr crate add https://github.com/index/hy/hybrid_autosar_stm32f429_demo/hybrid_autosar_stm32f429_demo-1.0.0.toml
+         alr update
+         alr build
