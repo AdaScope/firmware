@@ -1,7 +1,17 @@
 name = "adc_standalone"
-description = "Ada/Rust/C AUTOSAR demo on the stm32f429"
+description = "Firmware portion of the Adascope capstone project"
 version = "1.0.0"
 licenses = "BSD-3-Clause"
+
+authors = ["Adascope Team"]
+website = "https://github.com/AdaScope/firmware"
+maintainers = ["JS Demers <jdeme051@uottawa.ca>",]
+maintainers-logins = ["JSIT-20",]
+
+tags = [
+"embedded",
+"stm32",
+]
 
 executables = ["adc_standalone"]
 
