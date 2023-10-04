@@ -12,6 +12,45 @@ if ! which alr > /dev/null 2>&1; then
     exit 1
 fi
 
+# Check for and install missing dependencies
+check_and_install_dependencies() {
+    local missing_dependencies=()
+
+    # Check and install Alire packages
+    alire_list=(
+        "arm_cortex = \"1.0.0\""
+        "beta_types = \"1.0.0\""
+        "gnat_arm_elf = \"^12\""
+        "hal_embedded = \"1.0.0\""
+        "stm32_boards = \"1.0.0\""
+        "stm32_graphics = \"1.0.0\""
+        "stm32_components = \"1.0.0\""
+        "stm32_drivers = \"1.0.0\""
+        "stm32_svd = \"1.0.0\""
+    )
+
+    for package in "${alire_list[@]}"; do
+        if ! alr show "$package" &>/dev/null; then
+            missing_dependencies+=("$package")
+        fi
+    done
+
+    # Check if there are any missing dependencies
+    if [ ${#missing_dependencies[@]} -gt 0 ]; then
+        echo "Missing Alire dependencies: ${missing_dependencies[*]}"
+        echo "Installing missing Alire dependencies..."
+
+        for package in "${missing_dependencies[@]}"; do
+            alr with "$package"
+        done
+
+        echo "Alire dependencies installed."
+    fi
+}
+
+# Check and install dependencies
+check_and_install_dependencies
+
 # Get the target directory
 if [ -n "$1" ]; then
     target_directory="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
