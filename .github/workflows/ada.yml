@@ -25,6 +25,8 @@ jobs:
 
       - name: Run 
         run: |
-         alr crate add https://github.com/index/hy/hybrid_autosar_stm32f429_demo/hybrid_autosar_stm32f429_demo-1.0.0.toml
-         alr update
-         alr build
+          chmod +x install.sh
+          ./install.sh
+
+          
+         
