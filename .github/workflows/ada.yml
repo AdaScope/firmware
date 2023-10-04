@@ -25,6 +25,7 @@ jobs:
       - name: Install Missing Dependencies
         run: |
           # Install specified Ada dependencies using Alire
+          export PATH="$HOME/.alire/bin:$PATH
           alire install arm_cortex=1.0.0
           alire install beta_types=1.0.0
           alire install gnat_arm_elf="^12"
