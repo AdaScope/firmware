@@ -15,18 +15,18 @@ fi
 # Check for and install missing dependencies
 check_and_install_dependencies() {
     local missing_dependencies=()
-
+  
     # Check and install Alire packages
     alire_list=(
-        "arm_cortex = \"1.0.0\""
-        "beta_types = \"1.0.0\""
+        "arm_cortex=1.0.0"
+        "gnat_arm_elf="^12""
         "gnat_arm_elf = \"^12\""
-        "hal_embedded = \"1.0.0\""
-        "stm32_boards = \"1.0.0\""
-        "stm32_graphics = \"1.0.0\""
-        "stm32_components = \"1.0.0\""
-        "stm32_drivers = \"1.0.0\""
-        "stm32_svd = \"1.0.0\""
+        "hal_embedded = 1.0.0"
+        "stm32_boards = 1.0.0"
+        "stm32_graphics = 1.0.0"
+        "stm32_components = 1.0.0"
+        "stm32_drivers = 1.0.0"
+        "stm32_svd = 1.0.0"
     )
 
     for package in "${alire_list[@]}"; do
