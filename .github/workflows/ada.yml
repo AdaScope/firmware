@@ -22,19 +22,13 @@ jobs:
 
         # Install and setup Alire package manager
       - uses: alire-project/setup-alire@v2
+      
       - name: Install Missing Dependencies
         run: |
-          # Install specified Ada dependencies using Alire
-          export PATH="$HOME/.alire/bin:$PATH
-          alire install arm_cortex=1.0.0
-          alire install beta_types=1.0.0
-          alire install gnat_arm_elf="^12"
-          alire install hal_embedded=1.0.0
-          alire install stm32_boards=1.0.0
-          alire install stm32_graphics=1.0.0
-          alire install stm32_components=1.0.0
-          alire install stm32_drivers=1.0.0
-          alire install stm32_svd=1.0.0
+          chmod +x install.sh
+          ./install.sh
+
+          
       - name: Run 
         run: |
           alr build
