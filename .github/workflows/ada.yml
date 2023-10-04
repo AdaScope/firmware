@@ -24,15 +24,16 @@ jobs:
       - uses: alire-project/setup-alire@v2
       - name: Install Missing Dependencies
         run: |
-          alr with "arm_cortex = \"1.0.0\""
-          alr with "beta_types = \"1.0.0\""
-          alr with "gnat_arm_elf = \"^12\""
-          alr with "hal_embedded = \"1.0.0\""
-          alr with "stm32_boards = \"1.0.0\""
-          alr with "stm32_graphics = \"1.0.0\""
-          alr with "stm32_components = \"1.0.0\""
-          alr with "stm32_drivers = \"1.0.0\""
-          alr with "stm32_svd = \"1.0.0\""
+          # Install specified Ada dependencies using Alire
+          alire install arm_cortex=1.0.0
+          alire install beta_types=1.0.0
+          alire install gnat_arm_elf="^12"
+          alire install hal_embedded=1.0.0
+          alire install stm32_boards=1.0.0
+          alire install stm32_graphics=1.0.0
+          alire install stm32_components=1.0.0
+          alire install stm32_drivers=1.0.0
+          alire install stm32_svd=1.0.0
       - name: Run 
         run: |
           alr build
