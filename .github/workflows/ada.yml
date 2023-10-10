@@ -22,9 +22,12 @@ jobs:
 
         # Install and setup Alire package manager
       - uses: alire-project/setup-alire@v2
-
+          
       - name: Run 
         run: |
-         alr crate add https://github.com/index/hy/hybrid_autosar_stm32f429_demo/hybrid_autosar_stm32f429_demo-1.0.0.toml
-         alr update
-         alr build
+          alr index --add git+https://github.com/ohenley/alire-index.git#stable-1.2.1 --name testindex
+          alr build
+          
+
+          
+         
