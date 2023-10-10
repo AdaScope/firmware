@@ -25,6 +25,7 @@ jobs:
           
       - name: Run 
         run: |
+          alr clean
           alr index --add git+https://github.com/ohenley/alire-index.git#stable-1.2.1 --name testindex
           alr build
 
