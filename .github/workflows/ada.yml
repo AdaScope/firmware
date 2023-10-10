@@ -26,15 +26,7 @@ jobs:
       - name: Run 
         run: |
           alr index --add git+https://github.com/ohenley/alire-index.git#stable-1.2.1 --name testindex
-          alr install arm_cortex=1.0.0
-          alr install beta_types=1.0.0
-          alr install gnat_arm_elf="^12"
-          alr install hal_embedded=1.0.0
-          alr install stm32_boards=1.0.0
-          alr install stm32_graphics=1.0.0
-          alr install stm32_components=1.0.0
-          alr install stm32_drivers=1.0.0
-          alr install stm32_svd=1.0.0
+          alr build
           
 
           
