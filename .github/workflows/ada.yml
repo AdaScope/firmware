@@ -22,15 +22,10 @@ jobs:
 
         # Install and setup Alire package manager
       - uses: alire-project/setup-alire@v2
-      
-      - name: Install Missing Dependencies
-        run: |
-          chmod +x install.sh
-          ./install.sh
-
           
       - name: Run 
         run: |
+          alr index --add git+https://github.com/ohenley/alire-index.git#stable-1.2.1 --name testindex
           alr build
 
           
