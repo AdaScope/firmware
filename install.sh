@@ -14,8 +14,9 @@ fi
 
 # Check for and install missing dependencies
 check_and_install_dependencies() {
+    
     local missing_dependencies=()
-  
+    alr index --add git+https://github.com/ohenley/alire-index.git#stable-1.2.1 --name testindex
     # Check and install Alire packages
     alire_list=(
         "arm_cortex=1.0.0"
