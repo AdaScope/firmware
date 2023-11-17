@@ -1,5 +1,3 @@
-with Beta_Types; use Beta_Types;
-
 with Ada.Real_Time; use Ada.Real_Time;
 
 with STM32;
@@ -32,22 +30,30 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Textures.Autosar;
 
+with Min_Ada;
+
 procedure Adc_Standalone is
 
    Period : constant Time_Span := Milliseconds (250);  -- arbitrary
    Next_Release : Time := Clock;
    temp : Unbounded_String;
+   Context : Min_Ada.Min_Context;
+   Payload : Min_Ada.Min_Payload;
+   Payload_Index : Integer;
+   Data_Count : Integer;
+
+   function Read_ADC_Value (G : Simple_Adc.Group_T; 
+                           V : access Simple_Adc.Data_T) return Simple_Adc.Status_T
+   with
+      Import        => True,
+      Convention    => C,
+      External_Name => "Adc_ReadGroup";
+   Value : aliased Simple_Adc.Data_T := 0;
+   Result : Simple_Adc.Status_T;
 
     procedure Read_Adc is
-        function Read_ADC_Value (G : Simple_Adc.Group_T; 
-                                V : access Simple_Adc.Data_T) return Simple_Adc.Status_T
-        with
-            Import        => True,
-            Convention    => C,
-            External_Name => "Adc_ReadGroup";
 
-        Value : aliased Simple_Adc.Data_T := 0;
-        Result : Simple_Adc.Status_T := Read_ADC_Value (1, Value'Unchecked_Access);
+
     begin
         
         temp := To_Unbounded_String (Value'Image);
@@ -63,12 +69,33 @@ begin
    Simple_Adc.Start_Group_Conversion (1);
    Uart_For_Board.Initialize;
 
+   --Init min
+   Min_Ada.Min_Init_Context (Context);
+   Payload_Index := 1;
+   Data_Count := 0; --Max of 51 for now
 
    loop
-      Read_Adc;
-      --Uart_For_Board;
-      --Next_Release := Next_Release + Period;
-      --delay until Next_Release;
+      while Data_Count < 51 loop
+         Result := Read_ADC_Value (1, Value'Unchecked_Access);
+         temp := To_Unbounded_String (Value'Image);
+         for i in 2 .. Length(temp) loop
+            Payload(Min_Ada.Byte (Payload_Index)) := Min_Ada.Byte (Character'Pos(Element(temp, i)));
+            Payload_Index := Payload_Index + 1;
+         end loop;
+         Payload(Min_Ada.Byte (Payload_Index)) := Min_Ada.Byte (Character'Pos(ASCII.LF));
+         Payload_Index := Payload_Index + 1;
+         Data_Count := Data_Count + 1;
+      end loop;
+      Min_Ada.Send_Frame (
+         Context => Context,
+         ID => 5,
+         Payload => Payload,
+         Payload_Length => Min_Ada.Byte (Payload_Index - 1)
+      );
+
+      Data_Count := 0;
+      Payload_Index := 1;
+
    end loop;
 
 end Adc_Standalone;
