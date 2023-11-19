@@ -104,9 +104,9 @@ begin
             Payload_Index := Payload_Index + 1;
             Data_Count := Data_Count + 1;
          end loop;
+         Payload_Indexes (Frame_Index) := Payload_Index;
          Frame_Index := Frame_Index + 1;
          Data_Count := 0;
-         Payload_Indexes (Frame_Count) := Payload_Index;
          Payload_Index := 1;
       end loop;
 
@@ -119,6 +119,7 @@ begin
             Payload => Payloads(Frame_Index),
             Payload_Length => Min_Ada.Byte (Payload_Indexes(Frame_Index) - 1)
          );
+         Frame_Index := Frame_Index + 1;
       end loop;
    end loop;
 
