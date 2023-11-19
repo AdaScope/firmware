@@ -34,13 +34,20 @@ with Min_Ada;
 
 procedure Adc_Standalone is
 
-   Period        : constant Time_Span := Milliseconds (250);  -- arbitrary
-   Next_Release  : Time := Clock;
-   Temp          : Unbounded_String;
-   Context       : Min_Ada.Min_Context;
-   Payload       : Min_Ada.Min_Payload;
-   Payload_Index : Integer;
-   Data_Count    : Integer;
+   Frame_Count     : Integer := 10;
+
+   type Payload_Arr is
+      array (1 .. Frame_Count) of Min_Ada.Min_Payload;
+
+   Period          : constant Time_Span := Milliseconds (250);  -- arbitrary
+   Next_Release    : Time := Clock;
+   Temp            : Unbounded_String;
+   Context         : Min_Ada.Min_Context;
+   Payload_Index   : Integer;
+   Data_Count      : Integer;
+   Frame_Index     : Integer;
+   Payloads        : Payload_Arr;
+   Payload_Indexes : array (1 .. Frame_Count) of Integer;
 
    function Read_ADC_Value (
       G : Simple_Adc.Group_T;
@@ -78,30 +85,41 @@ begin
    Min_Ada.Min_Init_Context (Context);
    Payload_Index := 1;
    Data_Count := 0; -- Max of 51 for now
+   Frame_Index := 1;
 
    loop
-      while Data_Count < 51 loop
-         Result := Read_ADC_Value (1, Value'Unchecked_Access);
-         Temp := To_Unbounded_String (Value'Image);
-         for I in 2 .. Length (Temp) loop
-            Payload (Min_Ada.Byte (Payload_Index)) :=
-               Min_Ada.Byte (Character'Pos (Element (Temp, I)));
-                  Payload_Index := Payload_Index + 1;
-         end loop;
-         Payload (Min_Ada.Byte (Payload_Index)) :=
-            Min_Ada.Byte (Character'Pos (ASCII.LF));
+      --Iterate for 10 frames
+      while Frame_Index < Frame_Count + 1 loop
+         --Iterate for 50 data points
+         while Data_Count < 50 loop
+            Result := Read_ADC_Value (1, Value'Unchecked_Access);
+            Temp := To_Unbounded_String (Value'Image);
+            for I in 2 .. Length (Temp) loop
+               Payloads (Frame_Index) (Min_Ada.Byte (Payload_Index)) :=
+                  Min_Ada.Byte (Character'Pos (Element (Temp, I)));
                Payload_Index := Payload_Index + 1;
-         Data_Count := Data_Count + 1;
+            end loop;
+            Payloads (Frame_Index) (Min_Ada.Byte (Payload_Index)) :=
+               Min_Ada.Byte (Character'Pos (ASCII.LF));
+            Payload_Index := Payload_Index + 1;
+            Data_Count := Data_Count + 1;
+         end loop;
+         Frame_Index := Frame_Index + 1;
+         Data_Count := 0;
+         Payload_Indexes (Frame_Count) := Payload_Index;
+         Payload_Index := 1;
       end loop;
-      Min_Ada.Send_Frame (
-         Context => Context,
-         ID => 1,
-         Payload => Payload,
-         Payload_Length => Min_Ada.Byte (Payload_Index - 1)
-      );
 
-      Data_Count := 0;
-      Payload_Index := 1;
+      --Send 10 frames
+      Frame_Index := 1;
+      while Frame_Index < Frame_Count + 1 loop
+         Min_Ada.Send_Frame (
+            Context => Context,
+            ID => 1,
+            Payload => Payloads(Frame_Index),
+            Payload_Length => Min_Ada.Byte (Payload_Indexes(Frame_Index) - 1)
+         );
+      end loop;
    end loop;
 
 end Adc_Standalone;
