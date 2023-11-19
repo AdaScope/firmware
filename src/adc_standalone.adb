@@ -121,6 +121,8 @@ begin
          );
          Frame_Index := Frame_Index + 1;
       end loop;
+
+      Frame_Index := 1;
    end loop;
 
 end Adc_Standalone;
