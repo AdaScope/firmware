@@ -6,7 +6,7 @@ on:                    # Run the workflow for each of the following event:
     types: [created]   # - A release is created.
 
 jobs:
-  test:
+  build:
     strategy:
 
       fail-fast: false # Don't stop all the workflows when one of them fails.
@@ -23,10 +23,14 @@ jobs:
         # Install and setup Alire package manager
       - uses: alire-project/setup-alire@v2
           
-      - name: Run 
+      - name: Add custom Alire index
         run: |
           alr index --add git+https://github.com/ohenley/alire-index.git#stable-1.2.1 --name testindex
+
+      - name: Build the firmware
+        run: |
           alr build
+          
           
 
           
