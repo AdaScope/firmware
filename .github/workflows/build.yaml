@@ -30,8 +30,3 @@ jobs:
       - name: Build the firmware
         run: |
           alr build
-          
-          
-
-          
-         
