@@ -34,7 +34,8 @@ with Min_Ada;
 
 procedure Adc_Standalone is
 
-   Frame_Count     : Integer := 10;
+   Frame_Count             : Integer := 10;
+   Data_Points_Per_Payload : Integer := 50;
 
    type Payload_Arr is
       array (1 .. Frame_Count) of Min_Ada.Min_Payload;
@@ -88,10 +89,11 @@ begin
    Frame_Index := 1;
 
    loop
-      --Iterate for 10 frames
+      --  Iterate through all the frames
       while Frame_Index < Frame_Count + 1 loop
-         --Iterate for 50 data points
-         while Data_Count < 50 loop
+
+         --  Iterate through all the data points
+         while Data_Count < Data_Points_Per_Payload loop
             Result := Read_ADC_Value (1, Value'Unchecked_Access);
             Temp := To_Unbounded_String (Value'Image);
             for I in 2 .. Length (Temp) loop
@@ -113,6 +115,14 @@ begin
       --Send 10 frames
       Frame_Index := 1;
       while Frame_Index < Frame_Count + 1 loop
+         if Frame_Index = 1 then
+            Min_Ada.Send_Frame (
+               Context => Context,
+               ID => 5,
+               Payload => Payloads(Frame_Index),
+               Payload_Length => Min_Ada.Byte (Payload_Indexes(Frame_Index) - 1)
+            );
+         end if;
          Min_Ada.Send_Frame (
             Context => Context,
             ID => 1,

@@ -77,7 +77,7 @@ package body Uart_For_Board is
 
       Disable (USART_1);
 
-      Set_Baud_Rate    (USART_1, 115_200);
+      Set_Baud_Rate    (USART_1, 921_600);
       Set_Mode         (USART_1, Tx_Rx_Mode);
       Set_Stop_Bits    (USART_1, Stopbits_1);
       Set_Word_Length  (USART_1, Word_Length_8);
