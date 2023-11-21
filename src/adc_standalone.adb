@@ -1,5 +1,3 @@
-with Beta_Types; use Beta_Types;
-
 with Ada.Real_Time; use Ada.Real_Time;
 
 with STM32;
@@ -26,49 +24,115 @@ with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 
 with Uart_For_Board;
 with Simple_Adc;
-with adc;
+with Adc;
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Textures.Autosar;
 
+with Min_Ada;
+
 procedure Adc_Standalone is
 
-   Period : constant Time_Span := Milliseconds (250);  -- arbitrary
-   Next_Release : Time := Clock;
-   temp : Unbounded_String;
+   Frame_Count             : Integer := 10;
+   Data_Points_Per_Payload : Integer := 50;
 
-    procedure Read_Adc is
-        function Read_ADC_Value (G : Simple_Adc.Group_T; 
-                                V : access Simple_Adc.Data_T) return Simple_Adc.Status_T
-        with
-            Import        => True,
-            Convention    => C,
-            External_Name => "Adc_ReadGroup";
+   type Payload_Arr is
+      array (1 .. Frame_Count) of Min_Ada.Min_Payload;
 
-        Value : aliased Simple_Adc.Data_T := 0;
-        Result : Simple_Adc.Status_T := Read_ADC_Value (1, Value'Unchecked_Access);
-    begin
-        
-        temp := To_Unbounded_String (Value'Image);
-        for i in 2 .. Length(temp) loop
-          Uart_For_Board.Put_Blocking(USART_1, Character'Pos(Element(temp, i)));
-         end loop;
-        Uart_For_Board.Put_Blocking(USART_1, Character'Pos(ASCII.LF));
-    end;
+   Period          : constant Time_Span := Milliseconds (250);  -- arbitrary
+   Next_Release    : Time := Clock;
+   Temp            : Unbounded_String;
+   Context         : Min_Ada.Min_Context;
+   Payload_Index   : Integer;
+   Data_Count      : Integer;
+   Frame_Index     : Integer;
+   Payloads        : Payload_Arr;
+   Payload_Indexes : array (1 .. Frame_Count) of Integer;
 
+   function Read_ADC_Value (
+      G : Simple_Adc.Group_T;
+      V : access Simple_Adc.Data_T
+   ) return Simple_Adc.Status_T
+   with
+      Import        => True,
+      Convention    => C,
+      External_Name => "Adc_ReadGroup";
+
+   Value  : aliased Simple_Adc.Data_T := 0;
+   Result : Simple_Adc.Status_T;
+
+   procedure Read_Adc is
+   begin
+
+      Temp := To_Unbounded_String (Value'Image);
+      for I in 2 .. Length (Temp) loop
+         Uart_For_Board.Put_Blocking (
+            USART_1,
+            Character'Pos (Element (Temp, I))
+      );
+      end loop;
+      Uart_For_Board.Put_Blocking (
+         USART_1,
+         Character'Pos (ASCII.LF)
+      );
+   end Read_Adc;
 begin
-
-   adc.Init_ADC;
+   Adc.Init_ADC;
    Simple_Adc.Start_Group_Conversion (1);
    Uart_For_Board.Initialize;
 
+   --  Init min
+   Min_Ada.Min_Init_Context (Context);
+   Payload_Index := 1;
+   Data_Count := 0; -- Max of 51 for now
+   Frame_Index := 1;
 
    loop
-      Read_Adc;
-      --Uart_For_Board;
-      --Next_Release := Next_Release + Period;
-      --delay until Next_Release;
+      --  Iterate through all the frames
+      while Frame_Index < Frame_Count + 1 loop
+
+         --  Iterate through all the data points
+         while Data_Count < Data_Points_Per_Payload loop
+            Result := Read_ADC_Value (1, Value'Unchecked_Access);
+            Temp := To_Unbounded_String (Value'Image);
+            for I in 2 .. Length (Temp) loop
+               Payloads (Frame_Index) (Min_Ada.Byte (Payload_Index)) :=
+                  Min_Ada.Byte (Character'Pos (Element (Temp, I)));
+               Payload_Index := Payload_Index + 1;
+            end loop;
+            Payloads (Frame_Index) (Min_Ada.Byte (Payload_Index)) :=
+               Min_Ada.Byte (Character'Pos (ASCII.LF));
+            Payload_Index := Payload_Index + 1;
+            Data_Count := Data_Count + 1;
+         end loop;
+         Payload_Indexes (Frame_Index) := Payload_Index;
+         Frame_Index := Frame_Index + 1;
+         Data_Count := 0;
+         Payload_Index := 1;
+      end loop;
+
+      --Send 10 frames
+      Frame_Index := 1;
+      while Frame_Index < Frame_Count + 1 loop
+         if Frame_Index = 1 then
+            Min_Ada.Send_Frame (
+               Context => Context,
+               ID => 5,
+               Payload => Payloads(Frame_Index),
+               Payload_Length => Min_Ada.Byte (Payload_Indexes(Frame_Index) - 1)
+            );
+         end if;
+         Min_Ada.Send_Frame (
+            Context => Context,
+            ID => 1,
+            Payload => Payloads(Frame_Index),
+            Payload_Length => Min_Ada.Byte (Payload_Indexes(Frame_Index) - 1)
+         );
+         Frame_Index := Frame_Index + 1;
+      end loop;
+
+      Frame_Index := 1;
    end loop;
 
 end Adc_Standalone;
