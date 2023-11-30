@@ -15,8 +15,8 @@ with Beta_Types; use Beta_Types;
 package body Adc is
 
    Converter     : Analog_To_Digital_Converter renames ADC_1;
-   Input_Channel : constant Analog_Input_Channel := 5;
-   Input         : constant GPIO_Point := PA5;
+   Input_Channel : constant Analog_Input_Channel := 3;
+   Input         : constant GPIO_Point := PA3;
 
    Converter_2     : Analog_To_Digital_Converter renames ADC_2;
    Input_Channel_2 : constant Analog_Input_Channel := 13;
@@ -97,7 +97,7 @@ package body Adc is
          Continuous  => False,
          Trigger     => Software_Triggered,
          Enable_EOC  => True,
-         Conversions => All_Regular_Conversions);
+         Conversions => All_Regular_Conversions_2);
 
       Enable (Converter);
       Enable (Converter_2);

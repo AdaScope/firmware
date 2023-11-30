@@ -52,10 +52,6 @@ procedure Adc_Standalone is
    Payloads        : Payload_Arr;
    Payload_Indexes : array (1 .. Frame_Count) of Integer;
 
-
-   Payloads_2        : Payload_Arr;
-   Payload_Indexes_2 : array (1 .. Frame_Count) of Integer;
-
    Value  : Beta_Types.UInt32 := 0;
    --Result : Simple_Adc.Status_T;
 
@@ -93,8 +89,29 @@ begin
          Payload_Index := 1;
       end loop;
 
+      --Send 10 frames
       Frame_Index := 1;
-      --  Iterate through all the frames
+      while Frame_Index < Frame_Count + 1 loop
+         if Frame_Index = 1 then
+            Min_Ada.Send_Frame (
+               Context => Context,
+               ID => 5,
+               Payload => Payloads(Frame_Index),
+               Payload_Length => Min_Ada.Byte (Payload_Indexes(Frame_Index) - 1)
+            );
+         else
+            Min_Ada.Send_Frame (
+               Context => Context,
+               ID => 1,
+               Payload => Payloads(Frame_Index),
+               Payload_Length => Min_Ada.Byte (Payload_Indexes(Frame_Index) - 1)
+            );
+         end if;
+         Frame_Index := Frame_Index + 1;
+      end loop;
+
+      Frame_Index := 1;
+
       while Frame_Index < Frame_Count + 1 loop
 
          --  Iterate through all the data points
@@ -102,16 +119,16 @@ begin
             Value := Adc.Read_Group (2);
             Temp := To_Unbounded_String (Value'Image);
             for I in 2 .. Length (Temp) loop
-               Payloads_2 (Frame_Index) (Min_Ada.Byte (Payload_Index)) :=
-                 Min_Ada.Byte (Character'Pos (Element (Temp, I)));
+               Payloads (Frame_Index) (Min_Ada.Byte (Payload_Index)) :=
+                  Min_Ada.Byte (Character'Pos (Element (Temp, I)));
                Payload_Index := Payload_Index + 1;
             end loop;
-            Payloads_2 (Frame_Index) (Min_Ada.Byte (Payload_Index)) :=
+            Payloads (Frame_Index) (Min_Ada.Byte (Payload_Index)) :=
                Min_Ada.Byte (Character'Pos (ASCII.LF));
             Payload_Index := Payload_Index + 1;
             Data_Count := Data_Count + 1;
          end loop;
-         Payload_Indexes_2 (Frame_Index) := Payload_Index;
+         Payload_Indexes (Frame_Index) := Payload_Index;
          Frame_Index := Frame_Index + 1;
          Data_Count := 0;
          Payload_Index := 1;
@@ -123,37 +140,18 @@ begin
          if Frame_Index = 1 then
             Min_Ada.Send_Frame (
                Context => Context,
-               ID => 5,
+               ID => 6,
+               Payload => Payloads(Frame_Index),
+               Payload_Length => Min_Ada.Byte (Payload_Indexes(Frame_Index) - 1)
+            );
+         else
+            Min_Ada.Send_Frame (
+               Context => Context,
+               ID => 2,
                Payload => Payloads(Frame_Index),
                Payload_Length => Min_Ada.Byte (Payload_Indexes(Frame_Index) - 1)
             );
          end if;
-         Min_Ada.Send_Frame (
-            Context => Context,
-            ID => 1,
-            Payload => Payloads(Frame_Index),
-            Payload_Length => Min_Ada.Byte (Payload_Indexes(Frame_Index) - 1)
-         );
-         Frame_Index := Frame_Index + 1;
-      end loop;
-
-      --Send 10 frames
-      Frame_Index := 1;
-      while Frame_Index < Frame_Count + 1 loop
-         if Frame_Index = 1 then
-            Min_Ada.Send_Frame (
-               Context => Context,
-               ID => 6,
-               Payload => Payloads_2(Frame_Index),
-               Payload_Length => Min_Ada.Byte (Payload_Indexes_2(Frame_Index) - 1)
-            );
-         end if;
-         Min_Ada.Send_Frame (
-            Context => Context,
-            ID => 2,
-            Payload => Payloads_2(Frame_Index),
-            Payload_Length => Min_Ada.Byte (Payload_Indexes_2(Frame_Index) - 1)
-         );
          Frame_Index := Frame_Index + 1;
       end loop;
 
