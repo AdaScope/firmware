@@ -37,7 +37,7 @@ with Min_Ada;
 procedure Adc_Standalone is
 
    Frame_Count             : Integer := 10;
-   Data_Points_Per_Payload : Integer := 50;
+   Data_Points_Per_Payload : Integer := 120;
 
    type Payload_Arr is
       array (1 .. Frame_Count) of Min_Ada.Min_Payload;
