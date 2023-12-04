@@ -8,7 +8,7 @@ with STM32.ADC;  use STM32.ADC;
 with STM32.DMA;  use STM32.DMA;
 with STM32.GPIO; use STM32.GPIO;
 
-with Beta_Types; use Beta_Types; 
+with Beta_Types; use Beta_Types;  
 
 package body Simple_Adc is
    
