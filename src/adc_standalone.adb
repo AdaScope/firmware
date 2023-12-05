@@ -126,7 +126,8 @@ begin
       Send_Data(1);
       Collect_Data(2);
       Send_Data(2);
-
+      Collect_Data(3);
+      Send_Data(3);
    end loop;
 
 end Adc_Standalone;
