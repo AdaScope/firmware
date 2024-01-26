@@ -1,4 +1,5 @@
 with Ada.Real_Time; use Ada.Real_Time;
+with My_Min_Ada;
 
 with STM32;
 with STM32.Device; use STM32.Device;
@@ -120,13 +121,16 @@ begin
    Data_Count := 0; -- Max of 51 for now
    Frame_Index := 1;
 
+   My_Min_Ada.Override_Tx_Byte;
+
    loop
 
       Collect_Data(1);
       Send_Data(1);
       Collect_Data(2);
       Send_Data(2);
-
+      Collect_Data(3);
+      Send_Data(3);
    end loop;
 
 end Adc_Standalone;

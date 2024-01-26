@@ -21,6 +21,10 @@ package body Adc is
    Converter_2     : Analog_To_Digital_Converter renames ADC_2;
    Input_Channel_2 : constant Analog_Input_Channel := 13;
    Input_2         : constant GPIO_Point := PC3;
+
+   Converter_3     : Analog_To_Digital_Converter renames ADC_3;
+   Input_Channel_3 : constant Analog_Input_Channel := 11;
+   Input_3         : constant GPIO_Point := PC1;
    --  See the mapping of channels to GPIO pins at the top of the ADC package.
    --  Also see the board's User Manual for which GPIO pins are available.
    --  For example, on the F429 Discovery board, PA5 is not used by some
@@ -32,10 +36,11 @@ package body Adc is
    All_Regular_Conversions_2 : constant Regular_Channel_Conversions :=
           (1 => (Channel => Input_Channel_2, Sample_Time => Sample_144_Cycles));
 
+   All_Regular_Conversions_3 : constant Regular_Channel_Conversions :=
+          (1 => (Channel => Input_Channel_3, Sample_Time => Sample_144_Cycles));
+
 
    Successful : Boolean;
-
-   Successful_2 : Boolean;
 
    function Read_Group (Input: Integer) return Beta_Types.UInt32 is
    begin
@@ -43,10 +48,14 @@ package body Adc is
          Start_Conversion (Converter);
          Poll_For_Status (Converter, Regular_Channel_Conversion_Complete, Successful);
          return (Beta_Types.UInt32 (Conversion_Value (Converter))) * ADC_Supply_Voltage / 16#FFF#;
-      else
+      elsif Input = 2 then
          Start_Conversion (Converter_2);
          Poll_For_Status (Converter_2, Regular_Channel_Conversion_Complete, Successful);
          return (Beta_Types.UInt32 (Conversion_Value (Converter_2))) * ADC_Supply_Voltage / 16#FFF#;
+      else
+         Start_Conversion (Converter_3);
+         Poll_For_Status (Converter_3, Regular_Channel_Conversion_Complete, Successful);
+         return (Beta_Types.UInt32 (Conversion_Value (Converter_3))) * ADC_Supply_Voltage / 16#FFF#;
       end if;
    end Read_Group;
 
@@ -59,6 +68,9 @@ package body Adc is
 
          Enable_Clock (Input_2);
          Configure_IO (Input_2, (Mode => Mode_Analog, Resistors => Floating));
+
+         Enable_Clock (Input_3);
+         Configure_IO (Input_3, (Mode => Mode_Analog, Resistors => Floating));
       end Configure_Analog_Input;
 
    begin
@@ -66,6 +78,7 @@ package body Adc is
 
       Enable_Clock (Converter);
       Enable_Clock (Converter_2);
+      Enable_Clock (Converter_3);
 
       Reset_All_ADC_Units;
 
@@ -85,6 +98,11 @@ package body Adc is
          Resolution => ADC_Resolution_12_Bits,
          Alignment  => Right_Aligned);
 
+      Configure_Unit
+      (Converter_3,
+         Resolution => ADC_Resolution_12_Bits,
+         Alignment  => Right_Aligned);
+
       Configure_Regular_Conversions
       (Converter,
          Continuous  => False,
@@ -99,7 +117,15 @@ package body Adc is
          Enable_EOC  => True,
          Conversions => All_Regular_Conversions_2);
 
+      Configure_Regular_Conversions
+      (Converter_3,
+         Continuous  => False,
+         Trigger     => Software_Triggered,
+         Enable_EOC  => True,
+         Conversions => All_Regular_Conversions_3);
+
       Enable (Converter);
       Enable (Converter_2);
+      Enable (Converter_3);
    end Init_ADC;
 end Adc;
